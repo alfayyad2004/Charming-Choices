@@ -5,142 +5,163 @@ import { CheckCircle, ArrowRight, CornerDownRight } from 'lucide-astro';
 
 <Layout title="Thank You!">
   <section class="section-padding">
-    <div class="container text-center">
-      <div class="success-header">
-        <CheckCircle size={80} class="success-icon" />
-        <h1>Order Successfully Placed!</h1>
-        <p>Thank you for choosing Charming Choices. We've received your order and are currently processing it.</p>
-      </div>
-
-      <div class="next-steps-grid">
-        <div class="next-step-card glass">
-          <h3>Step 1: Check WhatsApp</h3>
-          <p>We will contact you shortly on the number provided to confirm fulfillment details and delivery schedule.</p>
+    <div class="container">
+      <div id="receipt-container" class="hidden">
+        <div class="success-header">
+          <CheckCircle size={80} class="success-icon" />
+          <h1>Order Successfully Placed!</h1>
+          <p>Thank you for choosing Charming Choices. Below is your digital receipt.</p>
         </div>
 
-        <div class="next-step-card glass highlight">
-          <h3>Step 2: Payment Details</h3>
-          <p>If you chose <strong>Bank Transfer</strong>, please use the details below. Send a screenshot of the receipt via WhatsApp.</p>
-          
-          <div class="bank-details">
-            <div class="bank-row">
-              <span>Bank Name:</span>
-              <strong>Republic Bank Limited</strong>
+        <div class="receipt-card glass">
+          <div class="receipt-header">
+            <div>
+              <span class="order-label">Order Number</span>
+              <h2 id="order-id">CC-0000</h2>
             </div>
-            <div class="bank-row">
-              <span>Account Name:</span>
-              <strong>Charming Choices</strong>
-            </div>
-            <div class="bank-row">
-              <span>Account Number:</span>
-              <strong>[Pending Bank Details]</strong>
-            </div>
-            <div class="bank-row">
-              <span>Account Type:</span>
-              <strong>Business Checking</strong>
+            <div class="text-right">
+              <span class="order-label">Date</span>
+              <p id="order-date"></p>
             </div>
           </div>
-          <p class="note">Please use your Name as the payment reference.</p>
+
+          <div class="receipt-details">
+            <div class="detail-section">
+              <h3>Customer Info</h3>
+              <p><strong id="customer-name"></strong></p>
+              <p id="customer-whatsapp"></p>
+              <p id="customer-email"></p>
+            </div>
+            <div class="detail-section">
+              <h3>Fulfillment</h3>
+              <p id="order-fulfillment"></p>
+              <p id="order-address" class="small-text"></p>
+            </div>
+          </div>
+
+          <div class="receipt-items">
+            <h3>Items Ordered</h3>
+            <div id="items-list"></div>
+            <div class="receipt-total">
+              <span>Total Amount</span>
+              <span id="order-total" class="total-price"></span>
+            </div>
+          </div>
+
+          <div class="payment-instruction highlight">
+            <h3>Payment Method: <span id="order-payment"></span></h3>
+            <p id="payment-text"></p>
+            <div id="bank-info" class="bank-details hidden">
+                <p><strong>Bank:</strong> Republic Bank Limited</p>
+                <p><strong>Acc Name:</strong> Charming Choices</p>
+                <p><strong>Acc Num:</strong> [Pending Bank Details]</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="success-actions">
+          <button id="whatsapp-receipt" class="btn btn-secondary whatsapp-btn">
+            Send Receipt to WhatsApp <CornerDownRight size={18} />
+          </button>
+          <a href="/products" class="btn btn-primary">
+            Continue Shopping <ArrowRight size={18} />
+          </a>
         </div>
       </div>
 
-      <div class="success-actions">
-        <a href="/products" class="btn btn-primary">
-          Continue Shopping <ArrowRight size={18} style="margin-left: 0.5rem" />
-        </a>
+      <div id="no-order" class="text-center section-padding hidden">
+         <CheckCircle size={64} style="color: var(--border); margin-bottom: 2rem;" />
+         <h2>Order Received!</h2>
+         <p>Thank you! Your order has been placed successfully.</p>
+         <a href="/products" class="btn btn-primary" style="margin-top: 2rem">Back to Shop</a>
       </div>
     </div>
   </section>
 </Layout>
 
+<script>
+  window.addEventListener('load', () => {
+    const orderRaw = sessionStorage.getItem('lastOrder');
+    if (!orderRaw) {
+      document.getElementById('no-order')?.classList.remove('hidden');
+      return;
+    }
+
+    const order = JSON.parse(orderRaw);
+    document.getElementById('receipt-container')?.classList.remove('hidden');
+
+    // Fill details
+    document.getElementById('order-id')!.textContent = order.orderNumber;
+    document.getElementById('order-date')!.textContent = new Date().toLocaleDateString();
+    document.getElementById('customer-name')!.textContent = order.name;
+    document.getElementById('customer-whatsapp')!.textContent = order.whatsapp;
+    document.getElementById('customer-email')!.textContent = order.email;
+    document.getElementById('order-fulfillment')!.textContent = order.fulfillment;
+    document.getElementById('order-total')!.textContent = order.total;
+    document.getElementById('order-payment')!.textContent = order.payment;
+
+    if (order.address) {
+      document.getElementById('order-address')!.textContent = order.address;
+    }
+
+    // Items
+    const itemsList = document.getElementById('items-list');
+    if (itemsList) {
+        itemsList.innerHTML = order.items.map((item: any) => `
+            <div class="item-row">
+                <span>${item.title} (x${item.quantity})</span>
+                <span>$${(item.price * item.quantity).toFixed(2)}</span>
+            </div>
+        `).join('');
+    }
+
+    // Payment Logic
+    const paymentText = document.getElementById('payment-text');
+    const bankInfo = document.getElementById('bank-info');
+    if (order.payment === 'Bank Transfer') {
+        paymentText!.textContent = 'Please complete the transfer and send a screenshot to our WhatsApp.';
+        bankInfo?.classList.remove('hidden');
+    } else {
+        paymentText!.textContent = 'Your payment will be collected at fulfillment.';
+    }
+
+    // WhatsApp Receipt
+    document.getElementById('whatsapp-receipt')?.addEventListener('click', () => {
+        const message = `Hi Charming Choices! Just placed order ${order.orderNumber}. 
+Summary: ${order.items.map((i:any) => i.title + '(x' + i.quantity + ')').join(', ')}
+Total: ${order.total}
+Method: ${order.payment}
+Fulfillment: ${order.fulfillment}`;
+        
+        window.open(`https://wa.me/18684678700?text=${encodeURIComponent(message)}`, '_blank');
+    });
+  });
+</script>
+
 <style>
-  .text-center {
-    text-align: center;
-  }
+  .text-center { text-align: center; }
+  .text-right { text-align: right; }
+  .success-header { margin-bottom: 4rem; text-align: center; }
+  .success-icon { color: #25D366; margin-bottom: 1.5rem; }
+  .receipt-card { max-width: 600px; margin: 0 auto 4rem; padding: 3rem; text-align: left; }
+  .receipt-header { display: flex; justify-content: space-between; border-bottom: 2px solid var(--border); padding-bottom: 1.5rem; margin-bottom: 2rem; }
+  .order-label { font-size: 0.8rem; text-transform: uppercase; color: var(--text-light); letter-spacing: 1px; }
+  .receipt-details { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem; }
+  .detail-section h3, .receipt-items h3 { font-size: 0.9rem; text-transform: uppercase; color: var(--primary); margin-bottom: 0.5rem; letter-spacing: 1px; }
+  .item-row { display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid #f0f0f0; font-size: 0.95rem; }
+  .receipt-total { display: flex; justify-content: space-between; padding-top: 1rem; margin-top: 1rem; font-weight: 700; color: var(--primary); font-size: 1.2rem; }
+  .payment-instruction { margin-top: 2rem; padding: 1.5rem; border-radius: var(--radius); background: #f9f9f9; }
+  .payment-instruction.highlight { border-left: 4px solid var(--secondary); }
+  .bank-details { margin-top: 1rem; font-size: 0.9rem; }
+  .success-actions { display: flex; justify-content: center; gap: 1.5rem; }
+  .whatsapp-btn { background-color: #25D366; border-color: #25D366; color: white !important; }
+  .whatsapp-btn:hover { background-color: #1ebe57; }
+  .hidden { display: none; }
+  .small-text { font-size: 0.85rem; color: var(--text-light); }
 
-  .success-header {
-    margin-bottom: 5rem;
-  }
-
-  .success-icon {
-    color: #25D366;
-    margin-bottom: 2rem;
-  }
-
-  h1 {
-    font-size: 3.5rem;
-    margin-bottom: 1rem;
-  }
-
-  .success-header p {
-    font-size: 1.25rem;
-    color: var(--text-light);
-    max-width: 600px;
-    margin: 0 auto;
-  }
-
-  .next-steps-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2rem;
-    max-width: 900px;
-    margin: 0 auto 5rem;
-    text-align: left;
-  }
-
-  .next-step-card {
-    padding: 3rem;
-    border-radius: var(--radius);
-  }
-
-  .next-step-card h3 {
-    margin-bottom: 1.5rem;
-    font-size: 1.5rem;
-    color: var(--primary);
-  }
-
-  .next-step-card.highlight {
-    border: 2px solid var(--secondary);
-    background-color: rgba(255, 215, 0, 0.05);
-  }
-
-  .bank-details {
-    background-color: white;
-    padding: 1.5rem;
-    border-radius: var(--radius);
-    margin: 1.5rem 0;
-    border: 1px solid var(--border);
-  }
-
-  .bank-row {
-    display: flex;
-    justify-content: space-between;
-    padding: 0.5rem 0;
-    font-size: 0.95rem;
-  }
-
-  .bank-row:not(:last-child) {
-    border-bottom: 1px solid #f0f0f0;
-  }
-
-  .note {
-    font-size: 0.85rem;
-    color: var(--text-light);
-    font-style: italic;
-  }
-
-  .success-actions {
-    display: flex;
-    justify-content: center;
-    gap: 2rem;
-  }
-
-  @media (max-width: 768px) {
-    .next-steps-grid {
-      grid-template-columns: 1fr;
-    }
-    h1 {
-      font-size: 2.5rem;
-    }
+  @media (max-width: 600px) {
+    .receipt-details { grid-template-columns: 1fr; gap: 1rem; }
+    .success-actions { flex-direction: column; }
+    .receipt-card { padding: 1.5rem; }
   }
 </style>

@@ -458,8 +458,23 @@ import { Trash2, ChevronRight, ChevronLeft, ShoppingBag } from 'lucide-astro';
   cartItems.subscribe(() => renderCart());
   
   // Clear cart on successful form submission (handled by Netlify, but we can clear local storage)
-  document.getElementById('checkout-form')?.addEventListener('submit', () => {
-    // We clear after a small delay to ensure Netlify captures the data if it needs to
+  document.getElementById('checkout-form')?.addEventListener('submit', (e) => {
+    // Save order summary for the success page
+    const formData = new FormData(e.target as HTMLFormElement);
+    const orderData = {
+      name: formData.get('name'),
+      email: formData.get('email'),
+      whatsapp: formData.get('whatsapp'),
+      items: cartItems.get(),
+      total: totalEl?.textContent,
+      fulfillment: formData.get('fulfillment'),
+      payment: formData.get('payment'),
+      address: formData.get('address'),
+      orderNumber: `CC-${Math.floor(1000 + Math.random() * 9000)}-${Date.now().toString().slice(-4)}`
+    };
+    sessionStorage.setItem('lastOrder', JSON.stringify(orderData));
+
+    // We clear after a small delay to ensure Netlify captures the data
     setTimeout(() => clearCart(), 1000);
   });
 </script>
