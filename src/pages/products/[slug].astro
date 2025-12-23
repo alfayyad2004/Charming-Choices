@@ -62,7 +62,9 @@ const { title, price, image, category, badge, description, stock } = product.dat
             </div>
             <div class="meta-item">
               <ShieldCheck size={18} />
-              <span>{stock > 0 ? `In Stock (${stock} available)` : 'Out of Stock'}</span>
+              <span id="stock-display" data-original-stock={stock}>
+                {stock > 0 ? `In Stock (${stock} available)` : 'Out of Stock'}
+              </span>
             </div>
           </div>
 
@@ -227,6 +229,34 @@ const { title, price, image, category, badge, description, stock } = product.dat
 
 <script>
   import { addToCart } from '../../stores/cartStore';
+  import { stockAdjustments } from '../../stores/stockStore';
+
+  // Stock Adjustment
+  const stockEl = document.getElementById('stock-display');
+  const addBtn = document.querySelector('.add-to-cart-btn') as HTMLButtonElement;
+  const originalStock = parseInt(stockEl?.getAttribute('data-original-stock') || '0');
+  const slug = window.location.pathname.split('/').filter(Boolean).pop()!;
+
+  function updateStockUI() {
+    const adjustments = stockAdjustments.get();
+    const used = adjustments[slug] || 0;
+    const remaining = Math.max(0, originalStock - used);
+    
+    if (stockEl) {
+      stockEl.textContent = remaining > 0 ? `In Stock (${remaining} available)` : 'Out of Stock';
+      if (remaining === 0) {
+        stockEl.style.color = '#ef4444';
+        if (addBtn) {
+           addBtn.disabled = true;
+           addBtn.innerHTML = 'Out of Stock';
+           addBtn.style.opacity = '0.5';
+           addBtn.style.cursor = 'not-allowed';
+        }
+      }
+    }
+  }
+
+  stockAdjustments.subscribe(() => updateStockUI());
 
   // Zoom logic
   const container = document.querySelector('.zoom-container') as HTMLElement;
@@ -246,12 +276,9 @@ const { title, price, image, category, badge, description, stock } = product.dat
   });
 
   // Cart logic
-  const addBtn = document.querySelector('.add-to-cart-btn');
   addBtn?.addEventListener('click', () => {
     const productData = JSON.parse(addBtn.getAttribute('data-product')!);
     addToCart(productData);
-    
-    // Alert or Toast could be added here
     window.location.href = '/cart';
   });
 </script>

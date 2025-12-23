@@ -140,6 +140,7 @@ import { User, Package, Heart, LogOut } from 'lucide-astro';
 
 <script>
   import { favoritesItems } from '../stores/favoritesStore';
+  import { orderHistory } from '../stores/historyStore';
 
   // Check if user is logged in
   window.addEventListener('load', () => {
@@ -159,12 +160,12 @@ import { User, Package, Heart, LogOut } from 'lucide-astro';
 
     // Render Favorites
     const favList = document.getElementById('favorites-list');
-    const items = favoritesItems.get();
+    const favItems = favoritesItems.get();
 
-    if (items.length > 0 && favList) {
+    if (favItems.length > 0 && favList) {
       favList.innerHTML = `
         <div class="favorites-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1.5rem; width: 100%;">
-          ${items.map(item => `
+          ${favItems.map(item => `
             <div class="fav-card" style="background: white; border-radius: 12px; overflow: hidden; border: 1px solid #eee;">
               <img src="${item.image}" style="width: 100%; aspect-ratio: 1; object-fit: cover;">
               <div style="padding: 1rem;">
@@ -178,6 +179,45 @@ import { User, Package, Heart, LogOut } from 'lucide-astro';
       favList.style.border = 'none';
       favList.style.background = 'none';
       favList.style.padding = '0';
+    }
+
+    // Render Order History
+    const ordersContainer = document.getElementById('orders');
+    const history = orderHistory.get();
+
+    if (history.length > 0 && ordersContainer) {
+      const historyHtml = `
+        <h2>Order History</h2>
+        <div class="orders-list" style="display: flex; flex-direction: column; gap: 1.5rem;">
+          ${history.map(order => `
+            <div class="order-card" style="background: white; padding: 1.5rem; border: 1px solid var(--border); border-radius: var(--radius);">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 1rem; border-bottom: 1px solid #eee; padding-bottom: 0.5rem;">
+                <div>
+                  <span style="font-size: 0.8rem; color: var(--text-light); text-transform: uppercase;">Order ID</span>
+                  <p style="font-weight: 700; margin: 0;">${order.id}</p>
+                </div>
+                <div style="text-align: right;">
+                  <span style="font-size: 0.8rem; color: var(--text-light); text-transform: uppercase;">Status</span>
+                  <p style="font-weight: 700; margin: 0; color: #25D366;">${order.status}</p>
+                </div>
+              </div>
+              <div style="margin-bottom: 1rem; font-size: 0.9rem;">
+                ${order.items.map(item => `
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                    <span>${item.title} (x${item.quantity})</span>
+                    <span>$${(item.price * item.quantity).toFixed(2)}</span>
+                  </div>
+                `).join('')}
+              </div>
+              <div style="display: flex; justify-content: space-between; font-weight: 700; border-top: 1px solid #eee; pt: 0.5rem;">
+                <span>Total Paid</span>
+                <span>${order.total}</span>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+      ordersContainer.innerHTML = historyHtml;
     }
   });
 

@@ -333,6 +333,8 @@ import { Trash2, ChevronRight, ChevronLeft, ShoppingBag } from 'lucide-astro';
 
 <script>
   import { cartItems, cartTotal, removeFromCart, clearCart } from '../stores/cartStore';
+  import { addOrderToHistory } from '../stores/historyStore';
+  import { adjustLocalStock } from '../stores/stockStore';
 
   const cartList = document.getElementById('cart-items-list');
   const emptyMsg = document.getElementById('empty-cart-msg');
@@ -462,17 +464,29 @@ import { Trash2, ChevronRight, ChevronLeft, ShoppingBag } from 'lucide-astro';
     // Save order summary for the success page
     const formData = new FormData(e.target as HTMLFormElement);
     const orderData = {
-      name: formData.get('name'),
-      email: formData.get('email'),
-      whatsapp: formData.get('whatsapp'),
-      items: cartItems.get(),
-      total: totalEl?.textContent,
-      fulfillment: formData.get('fulfillment'),
-      payment: formData.get('payment'),
-      address: formData.get('address'),
-      orderNumber: `CC-${Math.floor(1000 + Math.random() * 9000)}-${Date.now().toString().slice(-4)}`
+      id: `CC-${Math.floor(1000 + Math.random() * 9000)}-${Date.now().toString().slice(-4)}`,
+      name: formData.get('name') as string,
+      email: formData.get('email') as string,
+      whatsapp: formData.get('whatsapp') as string,
+      items: cartItems.get().map(i => ({ title: i.title, quantity: i.quantity, price: i.price })),
+      total: totalEl?.textContent || '0.00',
+      fulfillment: formData.get('fulfillment') as string,
+      payment: formData.get('payment') as string,
+      address: formData.get('address') as string,
+      date: new Date().toLocaleDateString(),
+      status: 'Processing' as const
     };
-    sessionStorage.setItem('lastOrder', JSON.stringify(orderData));
+    
+    // 1. Save to sessionStorage for immediate receipt
+    sessionStorage.setItem('lastOrder', JSON.stringify({ ...orderData, orderNumber: orderData.id }));
+    
+    // 2. Save to persistent history store
+    addOrderToHistory(orderData);
+
+    // 3. Adjust Local Stock
+    cartItems.get().forEach(item => {
+      adjustLocalStock(item.id, item.quantity);
+    });
 
     // We clear after a small delay to ensure Netlify captures the data
     setTimeout(() => clearCart(), 1000);
