@@ -1,5 +1,5 @@
 ---
-import { ShoppingBag, Search, Menu } from 'lucide-astro';
+import { ShoppingBag, Search, Menu, User } from 'lucide-astro';
 ---
 
 <header class="glass">
@@ -20,9 +20,12 @@ import { ShoppingBag, Search, Menu } from 'lucide-astro';
       <button class="icon-btn search-trigger" aria-label="Search">
         <Search size={20} />
       </button>
+      <button class="icon-btn account-trigger" aria-label="Account">
+        <User size={20} />
+      </button>
       <a href="/cart" class="icon-btn cart-btn" aria-label="View Cart">
         <ShoppingBag size={20} />
-        <span class="cart-count">0</span>
+        <span id="header-cart-count" class="cart-count">0</span>
       </a>
       <button class="icon-btn mobile-menu-btn" aria-label="Menu">
         <Menu size={24} />
@@ -142,3 +145,37 @@ import { ShoppingBag, Search, Menu } from 'lucide-astro';
     }
   }
 </style>
+
+<script>
+  import { cartCount } from '../../stores/cartStore';
+
+  const updateHeaderCount = (count: number) => {
+    const countEl = document.getElementById('header-cart-count');
+    if (countEl) {
+      countEl.textContent = count.toString();
+      (countEl as HTMLElement).style.display = count === 0 ? 'none' : 'flex';
+    }
+  };
+
+  cartCount.subscribe((count) => {
+    console.log('Header received count:', count);
+    updateHeaderCount(count);
+  });
+
+  // Account logic
+  const accountBtn = document.querySelector('.account-trigger');
+  accountBtn?.addEventListener('click', () => {
+    // Check if user is logged in
+    // @ts-ignore
+    if (window.netlifyIdentity) {
+      // @ts-ignore
+      const user = window.netlifyIdentity.currentUser();
+      if (user) {
+        window.location.href = '/account';
+      } else {
+        // @ts-ignore
+        window.netlifyIdentity.open('login');
+      }
+    }
+  });
+</script>

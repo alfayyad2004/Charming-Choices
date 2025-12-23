@@ -36,8 +36,11 @@ export function clearCart() {
 }
 
 export const cartTotal = atom(0);
+export const cartCount = atom(0);
 
 cartItems.subscribe((items) => {
     const total = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
+    const count = items.reduce((acc, item) => acc + item.quantity, 0);
     cartTotal.set(total);
+    cartCount.set(count);
 });

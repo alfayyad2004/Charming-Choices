@@ -31,7 +31,14 @@ const { title, price, image, category, badge } = product.data;
       <a href={`/products/${product.slug}`} class="action-btn" aria-label="Quick View">
         <Eye size={20} />
       </a>
-      <button class="action-btn add-to-cart" aria-label="Add to Cart" data-id={product.slug}>
+      <button 
+        class="action-btn add-to-cart" 
+        aria-label="Add to Cart" 
+        data-id={product.slug}
+        data-title={title}
+        data-price={price}
+        data-image={image}
+      >
         <ShoppingBag size={20} />
       </button>
     </div>
@@ -157,3 +164,38 @@ const { title, price, image, category, badge } = product.data;
     color: var(--primary);
   }
 </style>
+
+<script>
+  import { addToCart } from '../../stores/cartStore';
+
+  const addBtns = document.querySelectorAll('.add-to-cart');
+  addBtns.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      const id = btn.getAttribute('data-id') || '';
+      const title = btn.getAttribute('data-title') || '';
+      const price = parseFloat(btn.getAttribute('data-price') || '0');
+      const image = btn.getAttribute('data-image') || '';
+
+      addToCart({
+        id,
+        title,
+        price,
+        image
+      });
+
+      console.log('Added to cart:', title);
+
+      // Optional: Visual feedback
+      const originalIcon = btn.innerHTML;
+      btn.innerHTML = '✓';
+      btn.classList.add('added');
+      setTimeout(() => {
+        btn.innerHTML = originalIcon;
+        btn.classList.remove('added');
+      }, 1500);
+    });
+  });
+</script>

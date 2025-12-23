@@ -87,6 +87,9 @@ const { title, description = "Premium Home Decor, Electronics, and Gifts in Chag
 						});
 					}
 				});
+				window.netlifyIdentity.on("logout", () => {
+					document.location.href = "/";
+				});
 			}
 		</script>
 	</body>
