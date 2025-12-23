@@ -1,5 +1,5 @@
 ---
-import { ShoppingBag, Search, Menu, User } from 'lucide-astro';
+import { ShoppingBag, Search, Menu, User, LogOut } from 'lucide-astro';
 ---
 
 <header class="glass">
@@ -27,6 +27,9 @@ import { ShoppingBag, Search, Menu, User } from 'lucide-astro';
         <ShoppingBag size={20} />
         <span id="header-cart-count" class="cart-count">0</span>
       </a>
+      <button class="icon-btn logout-trigger hidden" aria-label="Log Out">
+        <LogOut size={20} />
+      </button>
       <button class="icon-btn mobile-menu-btn" aria-label="Menu">
         <Menu size={24} />
       </button>
@@ -164,6 +167,32 @@ import { ShoppingBag, Search, Menu, User } from 'lucide-astro';
 
   // Account logic
   const accountBtn = document.querySelector('.account-trigger');
+  const logoutBtn = document.querySelector('.logout-trigger');
+
+  function updateAuthUI() {
+    // @ts-ignore
+    if (window.netlifyIdentity) {
+      // @ts-ignore
+      const user = window.netlifyIdentity.currentUser();
+      if (user) {
+        logoutBtn?.classList.remove('hidden');
+      } else {
+        logoutBtn?.classList.add('hidden');
+      }
+    }
+  }
+
+  // Initialize and subscribe to identity events if available
+  // @ts-ignore
+  if (window.netlifyIdentity) {
+    // @ts-ignore
+    window.netlifyIdentity.on('init', () => updateAuthUI());
+    // @ts-ignore
+    window.netlifyIdentity.on('login', () => updateAuthUI());
+    // @ts-ignore
+    window.netlifyIdentity.on('logout', () => updateAuthUI());
+  }
+
   accountBtn?.addEventListener('click', () => {
     // Check if user is logged in
     // @ts-ignore
@@ -176,6 +205,14 @@ import { ShoppingBag, Search, Menu, User } from 'lucide-astro';
         // @ts-ignore
         window.netlifyIdentity.open('login');
       }
+    }
+  });
+
+  logoutBtn?.addEventListener('click', () => {
+    // @ts-ignore
+    if (window.netlifyIdentity) {
+      // @ts-ignore
+      window.netlifyIdentity.logout();
     }
   });
 </script>

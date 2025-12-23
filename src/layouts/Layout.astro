@@ -81,6 +81,17 @@ const { title, description = "Premium Home Decor, Electronics, and Gifts in Chag
 		<script is:inline>
 			if (window.netlifyIdentity) {
 				window.netlifyIdentity.on("init", (user) => {
+					// Session-only Logic:
+					// If this is a new tab/session (sessionStorage empty) but a user exists in localStorage,
+					// we log them out to ensure they have to log in per session.
+					if (!sessionStorage.getItem('cc_auth_session')) {
+						if (user) {
+							window.netlifyIdentity.logout();
+							return; // Logout will trigger reload/redirect
+						}
+						sessionStorage.setItem('cc_auth_session', 'active');
+					}
+
 					if (!user) {
 						window.netlifyIdentity.on("login", (user) => {
 							const roles = user?.app_metadata?.roles || [];
@@ -93,6 +104,7 @@ const { title, description = "Premium Home Decor, Electronics, and Gifts in Chag
 					}
 				});
 				window.netlifyIdentity.on("logout", () => {
+					sessionStorage.removeItem('cc_auth_session');
 					document.location.href = "/";
 				});
 			}
