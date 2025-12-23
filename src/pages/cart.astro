@@ -487,8 +487,5 @@ import { Trash2, ChevronRight, ChevronLeft, ShoppingBag } from 'lucide-astro';
     cartItems.get().forEach(item => {
       adjustLocalStock(item.id, item.quantity);
     });
-
-    // We clear after a small delay to ensure Netlify captures the data
-    setTimeout(() => clearCart(), 1000);
   });
 </script>

@@ -80,12 +80,17 @@ import { CheckCircle, ArrowRight, CornerDownRight } from 'lucide-astro';
 </Layout>
 
 <script>
+  import { clearCart } from '../stores/cartStore';
+
   window.addEventListener('load', () => {
     const orderRaw = sessionStorage.getItem('lastOrder');
     if (!orderRaw) {
       document.getElementById('no-order')?.classList.remove('hidden');
       return;
     }
+
+    // Clear cart immediately on successful receipt of the order
+    clearCart();
 
     const order = JSON.parse(orderRaw);
     document.getElementById('receipt-container')?.classList.remove('hidden');
