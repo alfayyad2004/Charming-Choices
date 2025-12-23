@@ -82,8 +82,13 @@ const { title, description = "Premium Home Decor, Electronics, and Gifts in Chag
 			if (window.netlifyIdentity) {
 				window.netlifyIdentity.on("init", (user) => {
 					if (!user) {
-						window.netlifyIdentity.on("login", () => {
-							document.location.href = "/admin/";
+						window.netlifyIdentity.on("login", (user) => {
+							const roles = user?.app_metadata?.roles || [];
+							if (roles.includes('admin')) {
+								document.location.href = "/admin/";
+							} else {
+								document.location.href = "/account";
+							}
 						});
 					}
 				});
