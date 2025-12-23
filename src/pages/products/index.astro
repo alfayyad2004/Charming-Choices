@@ -1,0 +1,143 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+import ProductCard from '../../components/catalog/ProductCard.astro';
+import ProductFilter from '../../components/catalog/ProductFilter.astro';
+import Search from '../../components/catalog/Search.astro';
+
+const allProducts = await getCollection('products');
+---
+
+<Layout title="Product Catalog">
+  <section class="section-padding">
+    <div class="container products-layout">
+      <aside class="sidebar">
+        <ProductFilter />
+      </aside>
+
+      <div class="main-content">
+        <div class="catalog-header">
+          <h1>Explore Our Collection</h1>
+          <p>Find the perfect items for your home, lifestyle, and loved ones.</p>
+        </div>
+
+        <Search />
+
+        <div id="product-grid" class="product-grid">
+          {allProducts.map((product) => (
+            <div 
+              class="product-item" 
+              data-title={product.data.title.toLowerCase()}
+              data-category={product.data.category}
+              data-price={product.data.price}
+            >
+              <ProductCard product={product} />
+            </div>
+          ))}
+        </div>
+
+        <div id="no-results" class="no-results hidden">
+          <p>No products found matching your criteria. Try adjusting your filters!</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .products-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 3rem;
+    align-items: start;
+  }
+
+  .catalog-header {
+    margin-bottom: 3rem;
+  }
+
+  .catalog-header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .catalog-header p {
+    color: var(--text-light);
+    font-size: 1.1rem;
+  }
+
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 2rem;
+  }
+
+  .no-results {
+    text-align: center;
+    padding: 5rem 0;
+    font-size: 1.25rem;
+    color: var(--text-light);
+    border: 2px dashed var(--border);
+    border-radius: var(--radius);
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  @media (max-width: 992px) {
+    .products-layout {
+      grid-template-columns: 1fr;
+    }
+    .sidebar {
+      display: none; /* In production, we'd add a mobile filter drawer */
+    }
+  }
+</style>
+
+<script>
+  let activeCategory = 'All';
+  let maxPrice = 9999;
+  let searchQuery = '';
+
+  const productItems = document.querySelectorAll('.product-item') as NodeListOf<HTMLElement>;
+  const noResults = document.getElementById('no-results');
+
+  function updateFilters() {
+    let visibleCount = 0;
+
+    productItems.forEach((item) => {
+      const title = item.getAttribute('data-title') || '';
+      const category = item.getAttribute('data-category') || '';
+      const price = parseFloat(item.getAttribute('data-price') || '0');
+
+      const matchesCategory = activeCategory === 'All' || category === activeCategory;
+      const matchesPrice = price <= maxPrice;
+      const matchesSearch = title.includes(searchQuery);
+
+      if (matchesCategory && matchesPrice && matchesSearch) {
+        item.style.display = 'block';
+        visibleCount++;
+      } else {
+        item.style.display = 'none';
+      }
+    });
+
+    if (visibleCount === 0) {
+      noResults?.classList.remove('hidden');
+    } else {
+      noResults?.classList.add('hidden');
+    }
+  }
+
+  window.addEventListener('filter-change', (e: any) => {
+    activeCategory = e.detail.category;
+    maxPrice = e.detail.maxPrice;
+    updateFilters();
+  });
+
+  window.addEventListener('search-change', (e: any) => {
+    searchQuery = e.detail.query;
+    updateFilters();
+  });
+</script>

@@ -1,0 +1,49 @@
+backend:
+  name: git-gateway
+  branch: main
+
+media_folder: "public/images/uploads"
+public_folder: "/images/uploads"
+
+collections:
+  - name: "products"
+    label: "Products"
+    folder: "src/content/products"
+    create: true
+    slug: "{{title}}"
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Description", name: "description", widget: "text" }
+      - { label: "Price (TTD)", name: "price", widget: "number", value_type: "float" }
+      - { 
+          label: "Category", 
+          name: "category", 
+          widget: "select", 
+          options: ["Home Decor", "Electronics", "Fashion", "Gifts"] 
+        }
+      - { label: "Featured Image", name: "image", widget: "image" }
+      - { 
+          label: "Badge", 
+          name: "badge", 
+          widget: "select", 
+          options: ["New Arrival", "Best Seller", "Sale"], 
+          required: false 
+        }
+      - { label: "Featured on Home", name: "featured", widget: "boolean", default: false }
+      - { label: "Stock Count", name: "stock", widget: "number", default: 10 }
+      - { label: "Body", name: "body", widget: "markdown" }
+
+  - name: "settings"
+    label: "Settings"
+    delete: false
+    editor:
+      preview: false
+    files:
+      - name: "home"
+        label: "Homepage Settings"
+        file: "src/content/settings/home.json"
+        fields:
+          - { label: "Hero Title", name: "heroTitle", widget: "string" }
+          - { label: "Hero Subtitle", name: "heroSubtitle", widget: "string" }
+          - { label: "Hero Image", name: "heroImage", widget: "image" }
+          - { label: "Promo Banner Text", name: "promoText", widget: "string" }

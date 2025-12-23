@@ -1,0 +1,463 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { Trash2, ChevronRight, ChevronLeft, ShoppingBag } from 'lucide-astro';
+---
+
+<Layout title="Your Cart & Checkout">
+  <section class="section-padding">
+    <div class="container">
+      <div class="checkout-container">
+        <!-- Step Indicator -->
+        <div class="step-indicator">
+          <div class="step active" data-step="1">1. Review</div>
+          <div class="step" data-step="2">2. Details</div>
+          <div class="step" data-step="3">3. Payment</div>
+        </div>
+
+        <form 
+          name="orders" 
+          method="POST" 
+          data-netlify="true" 
+          action="/success"
+          id="checkout-form"
+        >
+          <input type="hidden" name="form-name" value="orders" />
+          <input type="hidden" name="cart-contents" id="cart-data-input" />
+          <input type="hidden" name="total-amount" id="total-amount-input" />
+
+          <!-- Step 1: Cart Review -->
+          <div class="checkout-step active" id="step-1">
+            <h2>Review Your Items</h2>
+            <div id="cart-items-list" class="cart-items-list">
+              <!-- Dynamically populated -->
+            </div>
+            
+            <div class="cart-summary">
+              <div class="summary-row">
+                <span>Subtotal</span>
+                <span id="subtotal-val">$0.00 TTD</span>
+              </div>
+              <div class="summary-row">
+                <span>Delivery</span>
+                <span id="delivery-val">Calculated next</span>
+              </div>
+              <div class="summary-row total">
+                <span>Total</span>
+                <span id="total-val">$0.00 TTD</span>
+              </div>
+            </div>
+
+            <div class="step-actions">
+              <a href="/products" class="btn btn-secondary">Continue Shopping</a>
+              <button type="button" class="btn btn-primary next-step" data-next="2">
+                Customer Details <ChevronRight size={18} />
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 2: Customer Details -->
+          <div class="checkout-step" id="step-2">
+            <h2>Delivery Details</h2>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="name">Full Name *</label>
+                <input type="text" id="name" name="name" required placeholder="John Doe" />
+              </div>
+              <div class="form-group">
+                <label for="whatsapp">WhatsApp Number *</label>
+                <input type="tel" id="whatsapp" name="whatsapp" required placeholder="(868) 000-0000" />
+              </div>
+              <div class="form-group full-width">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" placeholder="john@example.com" />
+              </div>
+              <div class="form-group full-width">
+                <label for="fulfillment">Fulfillment Choice *</label>
+                <select id="fulfillment" name="fulfillment" required>
+                  <option value="Store Pickup (Chaguanas)">Store Pickup (Chaguanas) - FREE</option>
+                  <option value="Standard Delivery">Standard Delivery - $35 TTD</option>
+                  <option value="Express Delivery">Express Delivery - $60 TTD</option>
+                </select>
+              </div>
+              <div class="form-group full-width" id="address-group">
+                <label for="address">Delivery Address *</label>
+                <textarea id="address" name="address" rows="3" placeholder="Street name, City, Landmark"></textarea>
+              </div>
+            </div>
+
+            <div class="step-actions">
+              <button type="button" class="btn btn-secondary prev-step" data-prev="1">
+                <ChevronLeft size={18} /> Back
+              </button>
+              <button type="button" class="btn btn-primary next-step" data-next="3">
+                Payment Choice <ChevronRight size={18} />
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 3: Payment Preference -->
+          <div class="checkout-step" id="step-3">
+            <h2>Payment Choice</h2>
+            <p>Select how you would like to pay for your charming items.</p>
+            
+            <div class="payment-options">
+              <label class="payment-card">
+                <input type="radio" name="payment" value="Bank Transfer" required checked />
+                <div class="card-content">
+                  <h3>Bank Transfer</h3>
+                  <p>Pay via online banking. We'll show details next.</p>
+                </div>
+              </label>
+              
+              <label class="payment-card">
+                <input type="radio" name="payment" value="Cash on Delivery" />
+                <div class="card-content">
+                  <h3>Cash on Delivery</h3>
+                  <p>Pay in cash when your order arrives or at pickup.</p>
+                </div>
+              </label>
+
+              <label class="payment-card">
+                <input type="radio" name="payment" value="WiPay" />
+                <div class="card-content">
+                  <h3>WiPay (Link)</h3>
+                  <p>Pay via Credit Card. We'll send a link to your WhatsApp.</p>
+                </div>
+              </label>
+            </div>
+
+            <div class="final-notice">
+              <p>By clicking "Place Order", you agree to our Return & Privacy Policies. We will contact you on WhatsApp to confirm fulfillment.</p>
+            </div>
+
+            <div class="step-actions">
+              <button type="button" class="btn btn-secondary prev-step" data-prev="2">
+                <ChevronLeft size={18} /> Back
+              </button>
+              <button type="submit" class="btn btn-primary">
+                Place My Order <ShoppingBag size={18} style="margin-left: 0.5rem" />
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div id="empty-cart-msg" class="empty-cart hidden">
+        <ShoppingBag size={64} style="margin-bottom: 2rem; color: var(--border)" />
+        <h2>Your cart is currently empty</h2>
+        <p>Looks like you haven't added any charming items yet.</p>
+        <a href="/products" class="btn btn-primary" style="margin-top: 2rem">Explore Catalog</a>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .checkout-container {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .step-indicator {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4rem;
+    position: relative;
+  }
+
+  .step-indicator::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: var(--border);
+    z-index: -1;
+  }
+
+  .step {
+    background-color: white;
+    border: 2px solid var(--border);
+    padding: 0.5rem 1.5rem;
+    border-radius: 2rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-light);
+  }
+
+  .step.active {
+    border-color: var(--primary);
+    color: var(--primary);
+    background-color: white;
+  }
+
+  .checkout-step {
+    display: none;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .checkout-step.active {
+    display: block;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  h2 {
+    font-size: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  .cart-items-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+  }
+
+  /* Form Styles */
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+
+  .full-width {
+    grid-column: span 2;
+  }
+
+  .form-group label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  .form-group input, 
+  .form-group select, 
+  .form-group textarea {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-family: inherit;
+  }
+
+  .form-group input:focus {
+    outline: none;
+    border-color: var(--primary);
+  }
+
+  /* Payment styles */
+  .payment-options {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin: 2rem 0;
+  }
+
+  .payment-card {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: var(--transition);
+  }
+
+  .payment-card:has(input:checked) {
+    border-color: var(--primary);
+    background-color: rgba(0, 102, 68, 0.02);
+  }
+
+  .payment-card h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .payment-card p {
+    font-size: 0.9rem;
+    color: var(--text-light);
+  }
+
+  .cart-summary {
+    background-color: #f7f7f7;
+    padding: 2rem;
+    border-radius: var(--radius);
+    margin-bottom: 3rem;
+  }
+
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    color: var(--text-light);
+  }
+
+  .summary-row.total {
+    border-top: 1px solid var(--border);
+    padding-top: 1rem;
+    margin-top: 1rem;
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: var(--primary);
+  }
+
+  .step-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 3rem;
+  }
+
+  .empty-cart {
+    text-align: center;
+    padding: 5rem 0;
+  }
+
+  .hidden { display: none; }
+
+  @media (max-width: 600px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .full-width { grid-column: span 1; }
+    .step-indicator { display: none; }
+  }
+</style>
+
+<script>
+  import { cartItems, cartTotal, removeFromCart, clearCart } from '../stores/cartStore';
+
+  const cartList = document.getElementById('cart-items-list');
+  const emptyMsg = document.getElementById('empty-cart-msg');
+  const checkoutContainer = document.querySelector('.checkout-container');
+  const subtotalEl = document.getElementById('subtotal-val');
+  const totalEl = document.getElementById('total-val');
+  const deliveryEl = document.getElementById('delivery-val');
+  const cartInput = document.getElementById('cart-data-input') as HTMLInputElement;
+  const totalInput = document.getElementById('total-amount-input') as HTMLInputElement;
+
+  function renderCart() {
+    const items = cartItems.get();
+    
+    if (items.length === 0) {
+      checkoutContainer?.classList.add('hidden');
+      emptyMsg?.classList.remove('hidden');
+      return;
+    }
+
+    checkoutContainer?.classList.remove('hidden');
+    emptyMsg?.classList.add('hidden');
+
+    if (cartList) {
+      cartList.innerHTML = items.map(item => `
+        <div class="cart-item-row" style="display: flex; gap: 1rem; align-items: center; padding: 1rem; border: 1px solid var(--border); border-radius: var(--radius);">
+          <img src="${item.image}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;" />
+          <div style="flex-grow: 1;">
+            <h4 style="font-size: 1rem; margin: 0;">${item.title}</h4>
+            <p style="font-size: 0.85rem; color: var(--text-light); margin: 0;">${item.quantity} x $${item.price.toFixed(2)}</p>
+          </div>
+          <button type="button" class="remove-item" data-id="${item.id}" style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 0.5rem;">
+            Remove
+          </button>
+        </div>
+      `).join('');
+
+      // Add listeners to remove buttons
+      document.querySelectorAll('.remove-item').forEach(btn => {
+        btn.addEventListener('click', () => {
+          removeFromCart(btn.getAttribute('data-id')!);
+        });
+      });
+    }
+
+    const total = cartTotal.get();
+    if (subtotalEl) subtotalEl.textContent = `$${total.toFixed(2)} TTD`;
+    
+    updateFinalTotal();
+    
+    // Set hidden inputs
+    if (cartInput) {
+      cartInput.value = items.map(i => `${i.title} (x${i.quantity})`).join(', ');
+    }
+  }
+
+  function updateFinalTotal() {
+    const fulfillment = (document.getElementById('fulfillment') as HTMLSelectElement)?.value;
+    let delivery = 0;
+    
+    if (fulfillment === 'Standard Delivery') delivery = 35;
+    if (fulfillment === 'Express Delivery') delivery = 60;
+
+    const total = cartTotal.get() + delivery;
+    
+    if (deliveryEl) deliveryEl.textContent = delivery === 0 ? 'FREE' : `$${delivery.toFixed(2)} TTD`;
+    if (totalEl) totalEl.textContent = `$${total.toFixed(2)} TTD`;
+    if (totalInput) totalInput.value = `${total.toFixed(2)} TTD`;
+
+    // Toggle address field
+    const addressGroup = document.getElementById('address-group');
+    if (fulfillment === 'Store Pickup (Chaguanas)') {
+      addressGroup?.classList.add('hidden');
+    } else {
+      addressGroup?.classList.remove('hidden');
+    }
+  }
+
+  // Step Navigation
+  document.querySelectorAll('.next-step').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const next = btn.getAttribute('data-next');
+      
+      // Basic validation for Step 2
+      if (next === '3') {
+        const name = (document.getElementById('name') as HTMLInputElement).value;
+        const phone = (document.getElementById('whatsapp') as HTMLInputElement).value;
+        if (!name || !phone) {
+          alert('Please fill in your name and WhatsApp number.');
+          return;
+        }
+      }
+
+      document.querySelectorAll('.checkout-step').forEach(s => s.classList.remove('active'));
+      document.getElementById(`step-${next}`)?.classList.add('active');
+      
+      document.querySelectorAll('.step').forEach(s => {
+        s.classList.remove('active');
+        if (s.getAttribute('data-step') === next) s.classList.add('active');
+      });
+      
+      window.scrollTo(0, 0);
+    });
+  });
+
+  document.querySelectorAll('.prev-step').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const prev = btn.getAttribute('data-prev');
+      document.querySelectorAll('.checkout-step').forEach(s => s.classList.remove('active'));
+      document.getElementById(`step-${prev}`)?.classList.add('active');
+      
+      document.querySelectorAll('.step').forEach(s => {
+        s.classList.remove('active');
+        if (s.getAttribute('data-step') === prev) s.classList.add('active');
+      });
+      
+      window.scrollTo(0, 0);
+    });
+  });
+
+  document.getElementById('fulfillment')?.addEventListener('change', updateFinalTotal);
+
+  // Initial render
+  cartItems.subscribe(() => renderCart());
+  
+  // Clear cart on successful form submission (handled by Netlify, but we can clear local storage)
+  document.getElementById('checkout-form')?.addEventListener('submit', () => {
+    // We clear after a small delay to ensure Netlify captures the data if it needs to
+    setTimeout(() => clearCart(), 1000);
+  });
+</script>

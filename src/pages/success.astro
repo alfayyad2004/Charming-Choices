@@ -1,0 +1,146 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { CheckCircle, ArrowRight, CornerDownRight } from 'lucide-astro';
+---
+
+<Layout title="Thank You!">
+  <section class="section-padding">
+    <div class="container text-center">
+      <div class="success-header">
+        <CheckCircle size={80} class="success-icon" />
+        <h1>Order Successfully Placed!</h1>
+        <p>Thank you for choosing Charming Choices. We've received your order and are currently processing it.</p>
+      </div>
+
+      <div class="next-steps-grid">
+        <div class="next-step-card glass">
+          <h3>Step 1: Check WhatsApp</h3>
+          <p>We will contact you shortly on the number provided to confirm fulfillment details and delivery schedule.</p>
+        </div>
+
+        <div class="next-step-card glass highlight">
+          <h3>Step 2: Payment Details</h3>
+          <p>If you chose <strong>Bank Transfer</strong>, please use the details below. Send a screenshot of the receipt via WhatsApp.</p>
+          
+          <div class="bank-details">
+            <div class="bank-row">
+              <span>Bank Name:</span>
+              <strong>Republic Bank Limited</strong>
+            </div>
+            <div class="bank-row">
+              <span>Account Name:</span>
+              <strong>Charming Choices</strong>
+            </div>
+            <div class="bank-row">
+              <span>Account Number:</span>
+              <strong>[Pending Bank Details]</strong>
+            </div>
+            <div class="bank-row">
+              <span>Account Type:</span>
+              <strong>Business Checking</strong>
+            </div>
+          </div>
+          <p class="note">Please use your Name as the payment reference.</p>
+        </div>
+      </div>
+
+      <div class="success-actions">
+        <a href="/products" class="btn btn-primary">
+          Continue Shopping <ArrowRight size={18} style="margin-left: 0.5rem" />
+        </a>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .text-center {
+    text-align: center;
+  }
+
+  .success-header {
+    margin-bottom: 5rem;
+  }
+
+  .success-icon {
+    color: #25D366;
+    margin-bottom: 2rem;
+  }
+
+  h1 {
+    font-size: 3.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .success-header p {
+    font-size: 1.25rem;
+    color: var(--text-light);
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .next-steps-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    max-width: 900px;
+    margin: 0 auto 5rem;
+    text-align: left;
+  }
+
+  .next-step-card {
+    padding: 3rem;
+    border-radius: var(--radius);
+  }
+
+  .next-step-card h3 {
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+    color: var(--primary);
+  }
+
+  .next-step-card.highlight {
+    border: 2px solid var(--secondary);
+    background-color: rgba(255, 215, 0, 0.05);
+  }
+
+  .bank-details {
+    background-color: white;
+    padding: 1.5rem;
+    border-radius: var(--radius);
+    margin: 1.5rem 0;
+    border: 1px solid var(--border);
+  }
+
+  .bank-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    font-size: 0.95rem;
+  }
+
+  .bank-row:not(:last-child) {
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .note {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    font-style: italic;
+  }
+
+  .success-actions {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+  }
+
+  @media (max-width: 768px) {
+    .next-steps-grid {
+      grid-template-columns: 1fr;
+    }
+    h1 {
+      font-size: 2.5rem;
+    }
+  }
+</style>

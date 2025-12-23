@@ -1,0 +1,31 @@
+---
+interface Props {
+  type: 'New Arrival' | 'Best Seller' | 'Sale';
+}
+
+const { type } = Astro.props;
+
+const colors = {
+  'New Arrival': 'var(--accent)',
+  'Best Seller': 'var(--primary)',
+  'Sale': '#ef4444'
+};
+---
+
+<span class="badge" style={`--bg: ${colors[type]}`}>
+  {type}
+</span>
+
+<style>
+  .badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 2rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: white;
+    background-color: var(--bg);
+    letter-spacing: 0.05em;
+  }
+</style>

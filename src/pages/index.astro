@@ -1,0 +1,281 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+import ProductCard from '../components/catalog/ProductCard.astro';
+import homeSettings from '../content/settings/home.json';
+import { ArrowRight, Truck, ShieldCheck, Clock } from 'lucide-astro';
+
+const featuredProducts = await getCollection('products', ({ data }) => {
+  return data.featured === true;
+});
+---
+
+<Layout title="Home">
+  <!-- Promo Banner -->
+  <div class="promo-banner">
+    <div class="container">
+      <p>{homeSettings.promoText}</p>
+    </div>
+  </div>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container hero-grid">
+      <div class="hero-content">
+        <h1>{homeSettings.heroTitle}</h1>
+        <p>{homeSettings.heroSubtitle}</p>
+        <div class="hero-actions">
+          <a href="/products" class="btn btn-primary">
+            Shop Catalog <ArrowRight size={18} style="margin-left: 0.5rem;" />
+          </a>
+          <a href="/contact" class="btn btn-secondary">Visit Our Store</a>
+        </div>
+      </div>
+      <div class="hero-image">
+        <div class="image-box">
+          <!-- In production, we'd use the actual uploaded img -->
+          <div class="placeholder-img glass">
+             <span class="text-gradient">Charming Choices</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="features section-padding">
+    <div class="container feature-grid">
+      <div class="feature-card">
+        <div class="feature-icon"><Truck /></div>
+        <h3>Daily Delivery</h3>
+        <p>Reliable nationwide delivery across Trinidad & Tobago.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><ShieldCheck /></div>
+        <h3>Quality Guaranteed</h3>
+        <p>We hand-pick every item to ensure the highest standards.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><Clock /></div>
+        <h3>Fast Support</h3>
+        <p>Instant help via WhatsApp for all your inquiries.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Products -->
+  <section class="section-padding bg-light">
+    <div class="container">
+      <div class="section-header">
+        <h2>New & Noteworthy</h2>
+        <p>Hand-picked favorites from our latest arrivals.</p>
+      </div>
+
+      <div class="product-grid">
+        {featuredProducts.slice(0, 4).map((product) => (
+          <ProductCard product={product} />
+        ))}
+      </div>
+
+      <div class="view-all">
+        <a href="/products" class="btn btn-secondary">View All Products</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section class="section-padding">
+    <div class="container">
+      <div class="section-header">
+        <h2>What Our Customers Say</h2>
+        <p>Real reviews from our satisfied community in Chaguanas.</p>
+      </div>
+
+      <div class="testimonial-grid">
+        <div class="testimonial-card glass">
+          <p class="quote">"Absolutely love the glass containers! They look so elegant in my pantry. Great service too!"</p>
+          <p class="author">- Sarah M., San Fernando</p>
+        </div>
+        <div class="testimonial-card glass">
+          <p class="quote">"Fast delivery and the products are exactly as described. The speaker I bought is amazing."</p>
+          <p class="author">- David R., Port of Spain</p>
+        </div>
+        <div class="testimonial-card glass">
+          <p class="quote">"Friendly staff and high-quality items. My go-to place for unique gifts in Chaguanas."</p>
+          <p class="author">- Leandra K., Chaguanas</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .promo-banner {
+    background-color: var(--secondary);
+    color: var(--primary);
+    padding: 0.75rem 0;
+    text-align: center;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  .hero {
+    padding: 8rem 0;
+    background: radial-gradient(circle at top right, rgba(0, 102, 68, 0.05), transparent);
+  }
+
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+  }
+
+  .hero-content h1 {
+    font-size: 4rem;
+    margin-bottom: 1.5rem;
+    line-height: 1.1;
+  }
+
+  .hero-content p {
+    font-size: 1.25rem;
+    color: var(--text-light);
+    margin-bottom: 2.5rem;
+    max-width: 500px;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 1.5rem;
+  }
+
+  .hero-image {
+    position: relative;
+  }
+
+  .placeholder-img {
+    aspect-ratio: 4/5;
+    border-radius: var(--radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, white, #f0f0f0);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+  }
+
+  .feature-card {
+    text-align: center;
+    padding: 2.5rem;
+    background-color: var(--surface);
+    border-radius: var(--radius);
+    transition: var(--transition);
+  }
+
+  .feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow);
+  }
+
+  .feature-icon {
+    color: var(--primary);
+    margin-bottom: 1.5rem;
+    background-color: rgba(0, 102, 68, 0.05);
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .section-header {
+    text-align: center;
+    margin-bottom: 4rem;
+  }
+
+  .section-header h2 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .section-header p {
+    color: var(--text-light);
+    font-size: 1.1rem;
+  }
+
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+  }
+
+  .view-all {
+    text-align: center;
+    margin-top: 4rem;
+  }
+
+  .bg-light {
+    background-color: #f7f7f7;
+  }
+
+  .testimonial-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+  }
+
+  .testimonial-card {
+    padding: 2.5rem;
+    border-radius: var(--radius);
+  }
+
+  .quote {
+    font-style: italic;
+    color: var(--text);
+    margin-bottom: 1.5rem;
+    font-size: 1.1rem;
+  }
+
+  .author {
+    font-weight: 700;
+    color: var(--primary);
+    font-size: 0.9rem;
+  }
+
+  @media (max-width: 992px) {
+    .hero-grid {
+      grid-template-columns: 1fr;
+      text-align: center;
+    }
+    .hero-content p {
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .hero-actions {
+      justify-content: center;
+    }
+    .product-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .feature-grid {
+      grid-template-columns: 1fr;
+    }
+    .hero-content h1 {
+      font-size: 3rem;
+    }
+    .testimonial-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

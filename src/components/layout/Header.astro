@@ -1,0 +1,144 @@
+---
+import { ShoppingBag, Search, Menu } from 'lucide-astro';
+---
+
+<header class="glass">
+  <div class="container header-inner">
+    <a href="/" class="logo">
+      <span class="charming">Charming</span>
+      <span class="choices">Choices</span>
+    </a>
+
+    <nav class="desktop-nav">
+      <a href="/products">Shop All</a>
+      <a href="/products/home-decor">Home Decor</a>
+      <a href="/products/electronics">Electronics</a>
+      <a href="/products/gifts">Gifts</a>
+    </nav>
+
+    <div class="actions">
+      <button class="icon-btn search-trigger" aria-label="Search">
+        <Search size={20} />
+      </button>
+      <a href="/cart" class="icon-btn cart-btn" aria-label="View Cart">
+        <ShoppingBag size={20} />
+        <span class="cart-count">0</span>
+      </a>
+      <button class="icon-btn mobile-menu-btn" aria-label="Menu">
+        <Menu size={24} />
+      </button>
+    </div>
+  </div>
+</header>
+
+<style>
+  header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--header-height);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .logo {
+    display: flex;
+    flex-direction: column;
+    line-height: 1;
+  }
+
+  .charming {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary);
+  }
+
+  .choices {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--secondary);
+    font-weight: 600;
+    margin-top: -0.2rem;
+  }
+
+  .desktop-nav {
+    display: flex;
+    gap: 2rem;
+  }
+
+  .desktop-nav a {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-light);
+  }
+
+  .desktop-nav a:hover {
+    color: var(--primary);
+  }
+
+  .actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .icon-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 0.5rem;
+    transition: var(--transition);
+  }
+
+  .icon-btn:hover {
+    color: var(--primary);
+    transform: translateY(-1px);
+  }
+
+  .cart-count {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: var(--secondary);
+    color: var(--primary);
+    font-size: 0.7rem;
+    font-weight: 700;
+    width: 1.1rem;
+    height: 1.1rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .mobile-menu-btn {
+    display: none;
+  }
+
+  @media (max-width: 992px) {
+    .desktop-nav {
+      display: none;
+    }
+    .mobile-menu-btn {
+      display: flex;
+    }
+  }
+</style>

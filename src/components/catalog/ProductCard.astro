@@ -1,0 +1,159 @@
+---
+import { ShoppingBag, Eye } from 'lucide-astro';
+import Badge from '../ui/Badge.astro';
+
+interface Props {
+  product: {
+    slug: string;
+    data: {
+      title: string;
+      price: number;
+      image: string;
+      category: string;
+      badge?: 'New Arrival' | 'Best Seller' | 'Sale';
+    }
+  };
+}
+
+const { product } = Astro.props;
+const { title, price, image, category, badge } = product.data;
+---
+
+<div class="product-card">
+  <div class="image-wrapper">
+    <img src={image} alt={title} loading="lazy" />
+    {badge && (
+      <div class="badge-overlay">
+        <Badge type={badge} />
+      </div>
+    )}
+    <div class="card-actions">
+      <a href={`/products/${product.slug}`} class="action-btn" aria-label="Quick View">
+        <Eye size={20} />
+      </a>
+      <button class="action-btn add-to-cart" aria-label="Add to Cart" data-id={product.slug}>
+        <ShoppingBag size={20} />
+      </button>
+    </div>
+  </div>
+
+  <div class="content">
+    <p class="category">{category}</p>
+    <h3 class="title">
+      <a href={`/products/${product.slug}`}>{title}</a>
+    </h3>
+    <p class="price">${price.toFixed(2)} TTD</p>
+  </div>
+</div>
+
+<style>
+  .product-card {
+    background-color: var(--surface);
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: var(--transition);
+    border: 1px solid var(--border);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .image-wrapper {
+    position: relative;
+    aspect-ratio: 1;
+    overflow: hidden;
+    background-color: #f7f7f7;
+  }
+
+  .image-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+
+  .product-card:hover .image-wrapper img {
+    transform: scale(1.1);
+  }
+
+  .badge-overlay {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    z-index: 5;
+  }
+
+  .card-actions {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 1.5rem;
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    background: linear-gradient(to top, rgba(0,0,0,0.3), transparent);
+    transform: translateY(100%);
+    transition: var(--transition);
+  }
+
+  .product-card:hover .card-actions {
+    transform: translateY(0);
+  }
+
+  .action-btn {
+    width: 2.5rem;
+    height: 2.5rem;
+    background: white;
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary);
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: var(--shadow);
+  }
+
+  .action-btn:hover {
+    background-color: var(--primary);
+    color: white;
+  }
+
+  .content {
+    padding: 1.25rem;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .category {
+    font-size: 0.75rem;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+  }
+
+  .title {
+    font-size: 1.1rem;
+    margin-bottom: 0.75rem;
+    flex-grow: 1;
+  }
+
+  .title a:hover {
+    color: var(--primary);
+  }
+
+  .price {
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: var(--primary);
+  }
+</style>
