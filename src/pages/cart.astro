@@ -18,9 +18,11 @@ import { Trash2, ChevronRight, ChevronLeft, ShoppingBag } from 'lucide-astro';
           name="orders" 
           method="POST" 
           data-netlify="true" 
+          data-netlify-honeypot="bot-field"
           action="/success/"
           id="checkout-form"
         >
+          <div class="hidden"><label>Don’t fill this out if you're human: <input name="bot-field" /></label></div>
           <input type="hidden" name="form-name" value="orders" />
           <input type="hidden" name="cart-contents" id="cart-data-input" />
           <input type="hidden" name="total-amount" id="total-amount-input" />
