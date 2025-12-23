@@ -66,6 +66,9 @@ const { title, description = "Premium Home Decor, Electronics, and Gifts in Chag
 				]
 			}
 		</script>
+
+		<!-- Netlify Identity Widget -->
+		<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 	</head>
 	<body>
 		<Header />
@@ -74,5 +77,23 @@ const { title, description = "Premium Home Decor, Electronics, and Gifts in Chag
 		</main>
 		<Footer />
 		<WhatsAppWidget />
+
+		<script>
+			declare global {
+				interface Window {
+					netlifyIdentity: any;
+				}
+			}
+
+			if (window.netlifyIdentity) {
+				window.netlifyIdentity.on("init", (user: any) => {
+					if (!user) {
+						window.netlifyIdentity.on("login", () => {
+							document.location.href = "/admin/";
+						});
+					}
+				});
+			}
+		</script>
 	</body>
 </html>
